@@ -12,7 +12,9 @@ class User {
                 Address VARCHAR(255) NOT NULL,
                 Mobile_No VARCHAR(15) NOT NULL,
                 Email_Id VARCHAR(100) UNIQUE NOT NULL,
-                Password VARCHAR(255) NOT NULL
+                Password VARCHAR(255) NOT NULL,
+                Registration_Date DATETIME DEFAULT CURRENT_TIMESTAMP,
+                Last_Login DATETIME DEFAULT NULL
             )`);
 
             await db.query(`CREATE TABLE IF NOT EXISTS travel_agent_tb (
@@ -24,7 +26,9 @@ class User {
                 License_No VARCHAR(50) UNIQUE NOT NULL,
                 Mobile_No VARCHAR(15) NOT NULL,
                 Email_Id VARCHAR(100) UNIQUE NOT NULL,
-                Password VARCHAR(255) NOT NULL
+                Password VARCHAR(255) NOT NULL,
+                Registration_Date DATETIME DEFAULT CURRENT_TIMESTAMP,
+                Last_Login DATETIME DEFAULT NULL
             )`);
 
             await db.query(`CREATE TABLE IF NOT EXISTS admin_tb (
@@ -33,7 +37,9 @@ class User {
                 Last_Name VARCHAR(50) NOT NULL,
                 Mobile_No VARCHAR(15) NOT NULL,
                 Email_Id VARCHAR(100) UNIQUE NOT NULL,
-                Password VARCHAR(255) NOT NULL
+                Password VARCHAR(255) NOT NULL,
+                Registration_Date DATETIME DEFAULT CURRENT_TIMESTAMP,
+                Last_Login DATETIME DEFAULT NULL
             )`);
 
             console.log('Tables created or already exist');
@@ -61,7 +67,24 @@ class User {
             const isValidPassword = await bcrypt.compare(password, user.Password);
             if (!isValidPassword) throw new Error('Invalid password');
 
-            return user;
+            const [result] = await db.query(
+                `UPDATE ${tableName} 
+                 SET Last_Login = NOW() 
+                 WHERE Email_Id = ?`, 
+                [email]
+            );
+    
+            if (result.affectedRows === 0) {
+                throw new Error('Failed to update last login');
+            }
+            
+            //Later used in fetching the first name
+            return {
+                id: user.Customer_Id || user.Travel_Agent_Id || user.Admin_Id,
+                firstName: user.First_Name,
+                email: user.Email_Id,
+                role: tableName
+            };
         } catch (error) {
             console.error('Login error:', error);
             throw error;
@@ -80,10 +103,10 @@ class User {
             } else if (tableName === 'travel_agent_tb') {
                 sql = 'INSERT INTO travel_agent_tb (First_Name, Last_Name, Gender, Address, License_No, Mobile_No, Email_Id, Password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
                 values = [firstName, lastName, gender, address, licenseNo, mobileNo, email, hashedPassword];
-            } else if (tableName === 'admin_tb') {
+            } /*else if (tableName === 'admin_tb') {
                 sql = 'INSERT INTO admin_tb (First_Name, Last_Name, Mobile_No, Email_Id, Password) VALUES (?, ?, ?, ?, ?)';
                 values = [firstName, lastName, mobileNo, email, hashedPassword];
-            } else {
+            }*/ else {
                 throw new Error('Invalid table name');
             }
 
