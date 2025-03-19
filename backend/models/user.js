@@ -14,7 +14,7 @@ class User {
                 Email_Id VARCHAR(100) UNIQUE NOT NULL,
                 Password VARCHAR(255) NOT NULL,
                 Registration_Date DATETIME DEFAULT CURRENT_TIMESTAMP,
-                Last_Login DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+               Last_Login DATETIME DEFAULT NULL
             )`);
 
             await db.query(`CREATE TABLE IF NOT EXISTS travel_agent_tb (
@@ -28,7 +28,7 @@ class User {
                 Email_Id VARCHAR(100) UNIQUE NOT NULL,
                 Password VARCHAR(255) NOT NULL,
                 Registration_Date DATETIME DEFAULT CURRENT_TIMESTAMP,
-                Last_Login DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                Last_Login DATETIME DEFAULT NULL
             )`);
 
             await db.query(`CREATE TABLE IF NOT EXISTS admin_tb (
@@ -39,7 +39,7 @@ class User {
                 Email_Id VARCHAR(100) UNIQUE NOT NULL,
                 Password VARCHAR(255) NOT NULL,
                 Registration_Date DATETIME DEFAULT CURRENT_TIMESTAMP,
-                Last_Login DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                Last_Login DATETIME DEFAULT NULL
             )`);
 
             console.log('Tables created or already exist');
@@ -77,7 +77,6 @@ class User {
             if (result.affectedRows === 0) {
                 throw new Error('Failed to update last login');
             }
-
             //Later used in fetching the first name
             return {
                 id: user.Customer_Id || user.Travel_Agent_Id || user.Admin_Id,

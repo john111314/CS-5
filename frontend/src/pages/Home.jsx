@@ -11,11 +11,13 @@ const Home = () => {
                 <button>Go to login page</button>
             </Link>
             <br />
+
             <Link to="/travelAgent/travelAgentRegister">
                 <button>Go to Travel Agent Registration Page</button>
             </Link>
             <br />
-            <Link to="/customer/customerRegister">
+            
+            <Link to="/customer/CustomerRegister">
                 <button>Go to Customer Registration Page</button>
             </Link>
         </div>
